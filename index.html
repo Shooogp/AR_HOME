@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>كنبة في غرفتك</title>
+<meta name="description" content="جرّب الكنبة في غرفتك بالواقع المعزز وبحجمها الحقيقي قبل أن تطلبها.">
+<meta name="theme-color" content="#ECEEEA">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
+<style>
+/* التخطيط: مسرح ثلاثي الأبعاد يملأ أعلى الشاشة، وتحته بطاقة تشبه دفتر عيّنات القماش. على الشاشات الواسعة يتجاوران. */
+:root{
+  --ground:#ECEEEA;
+  --stage-hi:#F7F8F5;
+  --stage-lo:#DFE3DD;
+  --surface:#FBFBF9;
+  --ink:#1C211F;
+  --muted:#5B655F;
+  --line:#D2D8D2;
+  --accent:#2C3E73;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#E2E7F3;
+  --dim:#2C3E73;
+  --shadow:0 1px 2px rgba(28,33,31,.06),0 8px 24px rgba(28,33,31,.08);
+  --f-display:"Reem Kufi","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#121614;--stage-hi:#1F2522;--stage-lo:#101311;--surface:#1A1F1D;
+    --ink:#ECEFEC;--muted:#9BA59F;--line:#2F3632;--accent:#A9BAEE;--accent-ink:#121A33;
+    --accent-soft:#232B44;--dim:#B9C7F2;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#121614;--stage-hi:#1F2522;--stage-lo:#101311;--surface:#1A1F1D;
+  --ink:#ECEFEC;--muted:#9BA59F;--line:#2F3632;--accent:#A9BAEE;--accent-ink:#121A33;
+  --accent-soft:#232B44;--dim:#B9C7F2;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--f-body);font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+.app{min-height:100%;display:flex;flex-direction:column}
+
+/* ---------- المسرح ---------- */
+.stage{
+  position:relative;
+  height:clamp(340px,58svh,640px);
+  background:radial-gradient(120% 90% at 50% 35%,var(--stage-hi) 0%,var(--stage-lo) 100%);
+  overflow:hidden;
+}
+model-viewer{
+  width:100%;height:100%;display:block;
+  direction:ltr; /* مواضع النقاط داخل المشهد تُحسب من اليسار */
+  --poster-color:transparent;
+  --progress-bar-color:transparent;
+}
+.topbar{
+  position:absolute;inset:0 0 auto 0;z-index:2;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 14px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  pointer-events:none;
+}
+.tag{
+  pointer-events:auto;
+  font-size:.78rem;font-weight:600;letter-spacing:.02em;color:var(--muted);
+  background:color-mix(in srgb,var(--surface) 78%,transparent);
+  border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.tag b{color:var(--accent);font-weight:700}
+.dims-toggle{
+  pointer-events:auto;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.82rem;font-weight:600;
+  background:color-mix(in srgb,var(--surface) 78%,transparent);
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.dims-toggle svg{width:16px;height:16px}
+.dims-toggle[aria-pressed="true"]{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+
+.progress{position:absolute;inset:auto 0 0 0;height:3px;background:transparent}
+.progress span{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+
+/* خطوط المقاسات */
+.dim-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.dim-lines line{stroke:var(--dim);stroke-width:1.5;stroke-dasharray:4 3}
+.dot{display:block;width:2px;height:2px;padding:0;border:0;background:transparent;pointer-events:none;--min-hotspot-opacity:0}
+.dim-label{
+  pointer-events:none;border:0;
+  font-family:var(--f-body);font-size:.78rem;font-weight:700;font-variant-numeric:tabular-nums;
+  color:var(--accent-ink);background:var(--dim);border-radius:6px;padding:2px 8px;
+  white-space:nowrap;direction:rtl;
+  --min-hotspot-opacity:0;
+}
+model-viewer:not(.show-dims) .dot,
+model-viewer:not(.show-dims) .dim-label,
+model-viewer:not(.show-dims) .dim-lines{display:none}
+.dim-lines line.hide{display:none}
+
+/* ---------- البطاقة ---------- */
+.panel{
+  position:relative;z-index:3;
+  margin-top:-22px;
+  background:var(--surface);
+  border-radius:22px 22px 0 0;
+  box-shadow:0 -1px 0 var(--line),var(--shadow);
+  padding-block:24px calc(28px + env(safe-area-inset-bottom,0px));
+  padding-left:max(20px,env(safe-area-inset-left,0px));
+  padding-right:max(20px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:22px;
+  flex:1;
+}
+.grip{width:40px;height:4px;border-radius:4px;background:var(--line);margin:-10px auto 0}
+.kicker{margin:0;font-size:.8rem;font-weight:600;letter-spacing:.03em;color:var(--muted)}
+h1{
+  margin:2px 0 0;font-family:var(--f-display);font-weight:600;
+  font-size:clamp(1.6rem,5.2vw,2rem);line-height:1.25;text-wrap:balance;
+}
+
+.specs{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;
+}
+.spec{padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.spec + .spec{border-inline-start:1px solid var(--line)}
+.spec span{font-size:.75rem;color:var(--muted)}
+.spec strong{font-size:1.15rem;font-weight:700;font-variant-numeric:tabular-nums}
+.spec strong small{font-size:.75rem;font-weight:500;color:var(--muted);margin-inline-start:3px}
+
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{padding:0;margin-bottom:10px;font-size:.9rem;font-weight:600}
+legend output{color:var(--muted);font-weight:500}
+.swatches{display:flex;flex-wrap:wrap;gap:12px}
+.swatch{position:relative}
+.swatch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.swatch span{
+  display:block;width:44px;height:44px;border-radius:50%;
+  background-color:var(--c);
+  background-image:
+    repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 2px,transparent 2px 4px),
+    repeating-linear-gradient(-45deg,rgba(0,0,0,.10) 0 2px,transparent 2px 4px);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);
+  transition:transform .15s;
+}
+.swatch input:checked + span{box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 0 0 3px var(--surface),0 0 0 5px var(--accent)}
+.swatch input:focus-visible + span{outline:2px solid var(--accent);outline-offset:6px}
+.swatch input:hover + span{transform:scale(1.06)}
+
+.actions{display:flex;flex-direction:column;gap:10px}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  min-height:54px;border-radius:14px;cursor:pointer;
+  font-size:1.05rem;font-weight:700;border:1px solid transparent;
+  transition:transform .12s,background-color .15s;
+}
+.btn:active{transform:scale(.98)}
+.btn svg{width:22px;height:22px;flex:none}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-secondary{background:transparent;border-color:var(--line);color:var(--ink);font-weight:600;min-height:48px;font-size:1rem}
+.note{margin:0;font-size:.85rem;color:var(--muted);text-align:center;text-wrap:balance}
+.note.warn{color:var(--ink);background:var(--accent-soft);border-radius:10px;padding:8px 12px}
+
+.howto{border-top:1px solid var(--line);padding-top:18px}
+.howto h2{margin:0 0 10px;font-size:.95rem;font-weight:700}
+.howto ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;counter-reset:s}
+.howto li{display:flex;gap:10px;align-items:baseline;font-size:.92rem;color:var(--muted);counter-increment:s}
+.howto li::before{
+  content:counter(s);flex:none;width:22px;height:22px;border-radius:50%;
+  display:inline-grid;place-items:center;font-size:.75rem;font-weight:700;
+  background:var(--accent-soft);color:var(--accent);
+}
+
+.toast{
+  position:fixed;z-index:20;
+  left:50%;transform:translateX(-50%);
+  bottom:calc(20px + env(safe-area-inset-bottom,0px));
+  width:min(92vw,420px);
+  background:var(--ink);color:var(--surface);
+  border-radius:12px;padding:12px 16px;font-size:.92rem;line-height:1.5;
+  box-shadow:var(--shadow);text-align:center;
+}
+
+/* شاشة واسعة: المسرح بجانب البطاقة */
+@media (min-width:900px){
+  .app{display:grid;grid-template-columns:1fr minmax(360px,420px);height:100%}
+  .stage{height:100%}
+  .panel{margin-top:0;border-radius:0;box-shadow:inset 1px 0 0 var(--line);overflow-y:auto;justify-content:center}
+  .grip{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <section class="stage" aria-label="معاينة ثلاثية الأبعاد للكنبة">
+    <model-viewer id="mv"
+      src="sofa.glb"
+      alt="كنبة ثلاثية بقماش وأرجل خشبية"
+      camera-controls
+      touch-action="pan-y"
+      camera-orbit="35deg 72deg auto"
+      auto-rotate auto-rotate-delay="4000" rotation-per-second="10deg"
+      shadow-intensity="1" shadow-softness="0.9"
+      environment-image="neutral" exposure="0.88"
+      interaction-prompt="none"
+      ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor"
+      class="show-dims">
+
+      <div slot="ar-button" hidden></div>
+      <div class="progress" slot="progress-bar"><span id="bar"></span></div>
+
+      <!-- نقاط وخطوط المقاسات (تُضبط مواضعها من أبعاد المجسم الفعلية) -->
+      <button class="dot" slot="hotspot-w1" data-position="-1.05m 0m 0.53m" data-normal="0m 0m 1m" tabindex="-1" aria-hidden="true"></button>
+      <button class="dot" slot="hotspot-w2" data-position="1.05m 0m 0.53m" data-normal="0m 0m 1m" tabindex="-1" aria-hidden="true"></button>
+      <button class="dot" slot="hotspot-d1" data-position="1.11m 0m -0.46m" data-normal="1m 0m 0m" tabindex="-1" aria-hidden="true"></button>
+      <button class="dot" slot="hotspot-d2" data-position="1.11m 0m 0.47m" data-normal="1m 0m 0m" tabindex="-1" aria-hidden="true"></button>
+      <button class="dot" slot="hotspot-h2" data-position="1.11m 0.9m -0.46m" data-normal="1m 0m 0m" tabindex="-1" aria-hidden="true"></button>
+      <button class="dim-label" slot="hotspot-wl" data-position="0m 0m 0.53m" data-normal="0m 0m 1m" tabindex="-1">210 سم</button>
+      <button class="dim-label" slot="hotspot-dl" data-position="1.11m 0m 0m" data-normal="1m 0m 0m" tabindex="-1">93 سم</button>
+      <button class="dim-label" slot="hotspot-hl" data-position="1.11m 0.45m -0.46m" data-normal="1m 0m 0m" tabindex="-1">90 سم</button>
+      <svg class="dim-lines" aria-hidden="true">
+        <line id="lw"></line><line id="ld"></line><line id="lh"></line>
+      </svg>
+    </model-viewer>
+
+    <div class="topbar">
+      <span class="tag"><b>نموذج أولي</b> · واقع معزز</span>
+      <button class="dims-toggle" id="dimsBtn" type="button" aria-pressed="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 17 17 3l4 4L7 21z"/><path d="m7 13 2 2M10 10l2 2M13 7l2 2"/></svg>
+        المقاسات
+      </button>
+    </div>
+  </section>
+
+  <main class="panel">
+    <div class="grip" aria-hidden="true"></div>
+
+    <div>
+      <p class="kicker">غرفة المعيشة · كنب</p>
+      <h1>كنبة ثلاثية بطراز عصري</h1>
+    </div>
+
+    <div class="specs" aria-label="المقاسات">
+      <div class="spec"><span>العرض</span><strong><bdi id="sw">210</bdi><small>سم</small></strong></div>
+      <div class="spec"><span>العمق</span><strong><bdi id="sd">93</bdi><small>سم</small></strong></div>
+      <div class="spec"><span>الارتفاع</span><strong><bdi id="sh">90</bdi><small>سم</small></strong></div>
+    </div>
+
+    <fieldset>
+      <legend>لون القماش: <output id="colorName">رملي</output></legend>
+      <div class="swatches" id="swatches">
+        <label class="swatch" title="رملي"><input type="radio" name="fabric" id="c-sand" value="#C4B296" data-name="رملي" checked><span style="--c:#C4B296"></span></label>
+        <label class="swatch" title="زيتوني"><input type="radio" name="fabric" id="c-olive" value="#7C7E57" data-name="زيتوني"><span style="--c:#7C7E57"></span></label>
+        <label class="swatch" title="فحمي"><input type="radio" name="fabric" id="c-charcoal" value="#4A4D50" data-name="فحمي"><span style="--c:#4A4D50"></span></label>
+        <label class="swatch" title="نيلي"><input type="radio" name="fabric" id="c-indigo" value="#34466F" data-name="نيلي"><span style="--c:#34466F"></span></label>
+        <label class="swatch" title="طوبي"><input type="radio" name="fabric" id="c-brick" value="#A65F45" data-name="طوبي"><span style="--c:#A65F45"></span></label>
+      </div>
+    </fieldset>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="arBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 3 4.5 7.2v9.6L12 21l7.5-4.2V7.2z"/><path d="M4.5 7.2 12 11.4l7.5-4.2M12 11.4V21"/></svg>
+        ضعها في غرفتك
+      </button>
+      <p class="note" id="arNote">تظهر الكنبة بحجمها الحقيقي في المكان الذي تختاره.</p>
+      <button class="btn btn-secondary" id="orderBtn" type="button">أضف إلى الطلب</button>
+    </div>
+
+    <section class="howto">
+      <h2>طريقة التجربة</h2>
+      <ol>
+        <li>اضغط «ضعها في غرفتك» واسمح باستخدام الكاميرا.</li>
+        <li>وجّه الهاتف نحو الأرض وحرّكه ببطء حتى يتعرّف عليها.</li>
+        <li>اسحب الكنبة بإصبعك لتحريكها، وأدرها بإصبعين.</li>
+      </ol>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script type="module">
+const mv = document.getElementById('mv');
+const toastEl = document.getElementById('toast');
+let toastTimer;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toastEl.hidden = true; }, 3800);
+}
+
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) mv.removeAttribute('auto-rotate');
+
+/* شريط التحميل */
+const bar = document.getElementById('bar');
+mv.addEventListener('progress', e => {
+  const p = e.detail.totalProgress;
+  bar.style.width = (p * 100) + '%';
+  if (p >= 1) setTimeout(() => { bar.parentElement.hidden = true; }, 300);
+});
+
+/* لون القماش */
+let fabricColor = document.querySelector('input[name="fabric"]:checked').value;
+function applyColor(){
+  const m = mv.model && mv.model.materials.find(x => x.name === 'Fabric');
+  if (m) m.pbrMetallicRoughness.setBaseColorFactor(fabricColor);
+}
+document.getElementById('swatches').addEventListener('change', e => {
+  fabricColor = e.target.value;
+  document.getElementById('colorName').textContent = e.target.dataset.name;
+  applyColor();
+});
+
+/* المقاسات من أبعاد المجسم الفعلية */
+function setupDims(){
+  const d = mv.getDimensions();
+  const c = mv.getBoundingBoxCenter();
+  const x0 = c.x - d.x/2, x1 = c.x + d.x/2;
+  const z0 = c.z - d.z/2, z1 = c.z + d.z/2;
+  const y0 = c.y - d.y/2, y1 = c.y + d.y/2;
+  const off = 0.06;
+  const P = (x,y,z) => `${x}m ${y}m ${z}m`;
+  mv.updateHotspot({name:'hotspot-w1', position:P(x0, y0, z1+off)});
+  mv.updateHotspot({name:'hotspot-w2', position:P(x1, y0, z1+off)});
+  mv.updateHotspot({name:'hotspot-wl', position:P(c.x, y0, z1+off)});
+  mv.updateHotspot({name:'hotspot-d1', position:P(x1+off, y0, z0)});
+  mv.updateHotspot({name:'hotspot-d2', position:P(x1+off, y0, z1)});
+  mv.updateHotspot({name:'hotspot-dl', position:P(x1+off, y0, c.z)});
+  mv.updateHotspot({name:'hotspot-h2', position:P(x1+off, y1, z0)});
+  mv.updateHotspot({name:'hotspot-hl', position:P(x1+off, c.y, z0)});
+  const cm = v => Math.round(v * 100);
+  document.getElementById('sw').textContent = cm(d.x);
+  document.getElementById('sd').textContent = cm(d.z);
+  document.getElementById('sh').textContent = cm(d.y);
+  mv.querySelector('[slot="hotspot-wl"]').textContent = cm(d.x) + ' سم';
+  mv.querySelector('[slot="hotspot-dl"]').textContent = cm(d.z) + ' سم';
+  mv.querySelector('[slot="hotspot-hl"]').textContent = cm(d.y) + ' سم';
+}
+const lines = { w:document.getElementById('lw'), d:document.getElementById('ld'), h:document.getElementById('lh') };
+function drawLine(line, a, b){
+  const p = mv.queryHotspot(a), q = mv.queryHotspot(b);
+  if (!p || !q) return;
+  line.setAttribute('x1', p.canvasPosition.x); line.setAttribute('y1', p.canvasPosition.y);
+  line.setAttribute('x2', q.canvasPosition.x); line.setAttribute('y2', q.canvasPosition.y);
+  line.classList.toggle('hide', !(p.facingCamera || q.facingCamera));
+}
+function drawDims(){
+  if (!mv.classList.contains('show-dims')) return;
+  drawLine(lines.w, 'hotspot-w1', 'hotspot-w2');
+  drawLine(lines.d, 'hotspot-d1', 'hotspot-d2');
+  drawLine(lines.h, 'hotspot-d1', 'hotspot-h2');
+}
+mv.addEventListener('camera-change', drawDims);
+
+const dimsBtn = document.getElementById('dimsBtn');
+dimsBtn.addEventListener('click', () => {
+  const on = mv.classList.toggle('show-dims');
+  dimsBtn.setAttribute('aria-pressed', String(on));
+  if (on) requestAnimationFrame(drawDims);
+});
+
+/* الواقع المعزز */
+const arNote = document.getElementById('arNote');
+mv.addEventListener('load', () => {
+  applyColor();
+  setupDims();
+  requestAnimationFrame(drawDims);
+  if (!mv.canActivateAR) {
+    arNote.textContent = 'لتضع الكنبة في غرفتك افتح هذه الصفحة من متصفح الهاتف: Chrome على أندرويد أو Safari على آيفون.';
+    arNote.classList.add('warn');
+  }
+});
+document.getElementById('arBtn').addEventListener('click', () => {
+  if (!mv.canActivateAR) { toast('الواقع المعزز يعمل من متصفح الهاتف. افتح الرابط على هاتفك.'); return; }
+  mv.activateAR();
+});
+mv.addEventListener('ar-status', e => {
+  if (e.detail.status === 'failed') toast('تعذّر تشغيل الواقع المعزز على هذا الجهاز.');
+});
+
+/* الطلب (تجريبي) */
+document.getElementById('orderBtn').addEventListener('click', () => {
+  const name = document.querySelector('input[name="fabric"]:checked').dataset.name;
+  toast(`أُضيفت الكنبة باللون ${name} إلى الطلب. في النسخة الكاملة يصل الطلب إلى المحل مباشرة.`);
+});
+</script>
+</body>
+</html>
