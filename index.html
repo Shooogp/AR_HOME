@@ -207,7 +207,7 @@ legend output{color:var(--muted);font-weight:500}
 }
 
 .toast{
-  position:fixed;z-index:20;
+  position:fixed;z-index:40;
   left:50%;transform:translateX(-50%);
   bottom:calc(20px + env(safe-area-inset-bottom,0px));
   width:min(92vw,420px);
@@ -215,6 +215,91 @@ legend output{color:var(--muted);font-weight:500}
   border-radius:12px;padding:12px 16px;font-size:.92rem;line-height:1.5;
   box-shadow:var(--shadow);text-align:center;
 }
+
+/* ---------- استوديو الصورة (سطح تحرير داكن ثابت كأدوات الصور) ---------- */
+:root{
+  --s-bg:#0E1110;--s-panel:#171B19;--s-ink:#ECEFEC;--s-muted:#A3ADA7;--s-line:rgba(255,255,255,.12);
+  --s-accent:#A9BAEE;--s-accent-ink:#121A33;--s-brush:#E8455B;
+}
+body.studio-open{overflow:hidden}
+body.studio-open .app{display:none}
+.studio{
+  position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;
+  background:var(--s-bg);color:var(--s-ink);color-scheme:dark;
+}
+.studio-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 10px);padding-bottom:10px;
+  padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));
+  border-bottom:1px solid var(--s-line);
+}
+.icon-btn,.text-btn{
+  cursor:pointer;background:transparent;border:1px solid var(--s-line);color:var(--s-ink);
+  border-radius:999px;min-height:38px;font-size:.88rem;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 14px;
+}
+.icon-btn{width:38px;padding:0}
+.icon-btn svg{width:18px;height:18px}
+.steps{display:flex;gap:6px;margin:0;padding:0;list-style:none;counter-reset:st}
+.steps li{
+  counter-increment:st;display:flex;align-items:center;gap:6px;
+  font-size:.82rem;font-weight:600;color:var(--s-muted);
+}
+.steps li::before{
+  content:counter(st);width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  font-size:.72rem;border:1px solid var(--s-line);
+}
+.steps li[aria-current="step"]{color:var(--s-ink)}
+.steps li[aria-current="step"]::before{background:var(--s-accent);color:var(--s-accent-ink);border-color:transparent}
+.steps li + li{padding-inline-start:6px;border-inline-start:1px solid var(--s-line)}
+
+.canvas-wrap{position:relative;flex:1;min-height:0;display:grid;place-items:center;overflow:hidden}
+.photo-box{position:relative;touch-action:none;box-shadow:0 0 0 1px var(--s-line)}
+.photo-box canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#maskCanvas{opacity:.5;cursor:crosshair;touch-action:none}
+.studio[data-step="place"] #maskCanvas{pointer-events:none}
+.sofa-layer{
+  position:absolute;aspect-ratio:16/10;transform:translate(-50%,-50%);
+  touch-action:none;cursor:grab;outline:1px dashed rgba(255,255,255,.6);outline-offset:-1px;border-radius:6px;
+}
+.sofa-layer.dragging{cursor:grabbing;outline-color:var(--s-accent)}
+.sofa-layer model-viewer{width:100%;height:100%;pointer-events:none;background:transparent;direction:ltr}
+
+.busy{
+  position:absolute;inset:0;z-index:5;display:grid;place-content:center;justify-items:center;gap:12px;
+  background:rgba(14,17,16,.72);text-align:center;padding:24px;
+}
+.busy p{margin:0;font-weight:600}
+.busy small{color:var(--s-muted)}
+.spinner{width:36px;height:36px;border-radius:50%;border:3px solid var(--s-line);border-top-color:var(--s-accent);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.busy-bar{width:min(240px,60vw);height:4px;border-radius:4px;background:var(--s-line);overflow:hidden}
+.busy-bar span{display:block;height:100%;width:0;background:var(--s-accent);transition:width .2s}
+
+.studio-tools{
+  background:var(--s-panel);border-top:1px solid var(--s-line);
+  padding-block:14px calc(14px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:12px;max-height:46svh;overflow-y:auto;
+}
+.studio-tools .hint{margin:0;font-size:.9rem;color:var(--s-muted)}
+.tool-row{display:flex;align-items:center;gap:12px}
+.tool-row > *{min-width:0}
+.sliders{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:600;color:var(--s-muted);flex:1}
+.field input[type=range]{width:100%;accent-color:var(--s-accent)}
+.chip-btn{
+  cursor:pointer;flex:none;min-height:38px;padding:0 14px;border-radius:10px;
+  background:transparent;border:1px solid var(--s-line);color:var(--s-ink);font-size:.88rem;font-weight:600;
+}
+.chip-btn:disabled{opacity:.4;cursor:default}
+.studio .btn{flex:1;min-height:48px;font-size:1rem}
+.studio .btn-primary{background:var(--s-accent);color:var(--s-accent-ink)}
+.studio .btn-primary:disabled{opacity:.45;cursor:default}
+.studio .btn-secondary{border-color:var(--s-line);color:var(--s-ink)}
+.studio .swatches{gap:10px}
+.studio .swatch span{width:34px;height:34px}
+.studio .swatch input:checked + span{box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 0 0 2px var(--s-panel),0 0 0 4px var(--s-accent)}
 
 /* شاشة واسعة: المسرح بجانب البطاقة */
 @media (min-width:900px){
@@ -225,6 +310,7 @@ legend output{color:var(--muted);font-weight:500}
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important}
+  .spinner{animation-duration:2.4s}
 }
 </style>
 </head>
@@ -304,6 +390,10 @@ legend output{color:var(--muted);font-weight:500}
         ضعها في غرفتك
       </button>
       <p class="note" id="arNote">تظهر الكنبة بحجمها الحقيقي في المكان الذي تختاره.</p>
+      <button class="btn btn-secondary" id="photoBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m21 15-5-5-8 9"/></svg>
+        جرّبها على صورة غرفتك
+      </button>
       <button class="btn btn-secondary" id="orderBtn" type="button">أضف إلى الطلب</button>
     </div>
 
@@ -317,6 +407,67 @@ legend output{color:var(--muted);font-weight:500}
     </section>
   </main>
 </div>
+
+<input type="file" id="photoInput" accept="image/*" hidden>
+
+<section class="studio" id="studio" data-step="erase" hidden aria-label="استوديو الصورة">
+  <header class="studio-bar">
+    <button class="icon-btn" id="studioClose" type="button" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <ol class="steps">
+      <li id="stepErase" aria-current="step">امسح القديمة</li>
+      <li id="stepPlace">ضع الجديدة</li>
+    </ol>
+    <button class="text-btn" id="newPhoto" type="button">صورة أخرى</button>
+  </header>
+
+  <div class="canvas-wrap" id="canvasWrap">
+    <div class="photo-box" id="photoBox">
+      <canvas id="photoCanvas"></canvas>
+      <canvas id="maskCanvas"></canvas>
+      <div class="sofa-layer" id="sofaLayer" hidden>
+        <model-viewer id="mv2" loading="eager" interaction-prompt="none"
+          shadow-intensity="1.2" shadow-softness="0.7"
+          environment-image="neutral" exposure="0.88"
+          camera-orbit="0deg 78deg 80%" field-of-view="30deg"></model-viewer>
+      </div>
+    </div>
+    <div class="busy" id="busy" hidden>
+      <div class="spinner" aria-hidden="true"></div>
+      <p id="busyText">جارٍ المحو…</p>
+      <div class="busy-bar"><span id="busyBar"></span></div>
+      <small id="busySub"></small>
+    </div>
+  </div>
+
+  <div class="studio-tools" id="toolsErase">
+    <p class="hint">مرّر إصبعك على الكنبة القديمة وظلّها حتى تغطيها كلها، ثم اضغط «امسح».</p>
+    <div class="tool-row">
+      <label class="field" for="brush">حجم الفرشاة<input type="range" id="brush" min="10" max="90" value="36"></label>
+      <button class="chip-btn" id="undoBtn" type="button" disabled>تراجع</button>
+    </div>
+    <div class="tool-row">
+      <button class="btn btn-secondary" id="skipErase" type="button">لا يوجد ما أمسحه</button>
+      <button class="btn btn-primary" id="eraseBtn" type="button" disabled>امسح</button>
+    </div>
+  </div>
+
+  <div class="studio-tools" id="toolsPlace" hidden>
+    <p class="hint">اسحب الكنبة إلى مكانها بإصبعك، وكبّرها بإصبعين، ثم اضبط الدوران وزاوية النظر.</p>
+    <div class="sliders">
+      <label class="field" for="sizeR">الحجم<input type="range" id="sizeR" min="15" max="160" value="62"></label>
+      <label class="field" for="rotR">الدوران<input type="range" id="rotR" min="-90" max="90" value="0"></label>
+      <label class="field" for="tiltR">زاوية النظر<input type="range" id="tiltR" min="55" max="89" value="78"></label>
+      <label class="field" for="lightR">الإضاءة<input type="range" id="lightR" min="45" max="140" value="88"></label>
+    </div>
+    <div class="swatches" id="swatches2" data-kind="leather"></div>
+    <div class="tool-row">
+      <button class="btn btn-secondary" id="backErase" type="button">ارجع للمسح</button>
+      <button class="btn btn-primary" id="saveBtn" type="button">احفظ الصورة</button>
+    </div>
+  </div>
+</section>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -373,49 +524,67 @@ const PRODUCTS = {
 };
 let product = 'chesterfield';
 let swatch = PRODUCTS[product].swatches[0];
-let originalTex = null, texCache = {}, applyToken = 0;
+const mv2 = document.getElementById('mv2');
+/* لكل عارض حالته: الخامة الأصلية والخامات المحمّلة */
+const viewerState = new Map();
+function vstate(v){
+  if (!viewerState.has(v)) viewerState.set(v, { originalTex: null, texCache: {}, token: 0 });
+  return viewerState.get(v);
+}
 
-const swatchesEl = document.getElementById('swatches');
+const swatchGroups = [
+  { el: document.getElementById('swatches'),  name: 'color' },
+  { el: document.getElementById('swatches2'), name: 'color2' },
+];
 function renderSwatches(){
   const p = PRODUCTS[product];
-  swatchesEl.dataset.kind = p.kind;
-  swatchesEl.replaceChildren(...p.swatches.map(s => {
-    const label = document.createElement('label');
-    label.className = 'swatch'; label.title = s.name;
-    const input = document.createElement('input');
-    input.type = 'radio'; input.name = 'color'; input.id = `c-${product}-${s.id}`;
-    input.value = s.id; input.checked = s === swatch;
-    const chip = document.createElement('span');
-    chip.style.setProperty('--c', s.color);
-    label.append(input, chip);
-    return label;
-  }));
+  for (const g of swatchGroups) {
+    g.el.dataset.kind = p.kind;
+    g.el.replaceChildren(...p.swatches.map(s => {
+      const label = document.createElement('label');
+      label.className = 'swatch'; label.title = s.name;
+      const input = document.createElement('input');
+      input.type = 'radio'; input.name = g.name; input.id = `${g.name}-${product}-${s.id}`;
+      input.value = s.id; input.checked = s === swatch;
+      input.setAttribute('aria-label', s.name);
+      const chip = document.createElement('span');
+      chip.style.setProperty('--c', s.color);
+      label.append(input, chip);
+      return label;
+    }));
+  }
   document.getElementById('legendLabel').textContent = p.legend;
   document.getElementById('colorName').textContent = swatch.name;
 }
 
-async function applyColor(){
+async function applyColor(v = mv){
   const p = PRODUCTS[product];
-  const m = mv.model && mv.model.materials.find(x => x.name === p.material);
+  const m = v.model && v.model.materials.find(x => x.name === p.material);
   if (!m) return;
   if (p.mode === 'factor') { m.pbrMetallicRoughness.setBaseColorFactor(swatch.color); return; }
+  const st = vstate(v);
   const slot = m.pbrMetallicRoughness.baseColorTexture;
-  if (!originalTex) originalTex = slot.texture;
-  const token = ++applyToken;
-  if (!swatch.tex) { slot.setTexture(originalTex); return; }
+  if (!st.originalTex) st.originalTex = slot.texture;
+  const token = ++st.token;
+  if (!swatch.tex) { slot.setTexture(st.originalTex); return; }
   try {
-    const tex = await (texCache[swatch.tex] ||= mv.createTexture(swatch.tex));
-    if (token === applyToken) slot.setTexture(tex);
+    const tex = await (st.texCache[swatch.tex] ||= v.createTexture(swatch.tex));
+    if (token === st.token) slot.setTexture(tex);
   } catch {
-    delete texCache[swatch.tex];
+    delete st.texCache[swatch.tex];
     toast('تعذّر تحميل هذا اللون. حاول مرة أخرى.');
   }
 }
 
-swatchesEl.addEventListener('change', e => {
+for (const g of swatchGroups) g.el.addEventListener('change', e => {
   swatch = PRODUCTS[product].swatches.find(s => s.id === e.target.value);
   document.getElementById('colorName').textContent = swatch.name;
-  applyColor();
+  for (const o of swatchGroups) {
+    const input = o.el.querySelector(`input[value="${swatch.id}"]`);
+    if (input) input.checked = true;
+  }
+  applyColor(mv);
+  if (mv2.loaded) applyColor(mv2);
 });
 
 document.getElementById('picker').addEventListener('change', e => {
@@ -484,8 +653,8 @@ dimsBtn.addEventListener('click', () => {
 /* الواقع المعزز */
 const arNote = document.getElementById('arNote');
 mv.addEventListener('load', () => {
-  originalTex = null; texCache = {};
-  applyColor();
+  viewerState.delete(mv);
+  applyColor(mv);
   setupDims();
   requestAnimationFrame(drawDims);
   if (!mv.canActivateAR) {
@@ -504,6 +673,339 @@ mv.addEventListener('ar-status', e => {
 /* الطلب (تجريبي) */
 document.getElementById('orderBtn').addEventListener('click', () => {
   toast(`أُضيفت ${PRODUCTS[product].title} باللون ${swatch.name} إلى الطلب. في النسخة الكاملة يصل الطلب إلى المحل مباشرة.`);
+});
+
+/* ================= استوديو الصورة: امسح القديمة وضع الجديدة ================= */
+const $ = id => document.getElementById(id);
+const studio = $('studio'), photoInput = $('photoInput'), photoBox = $('photoBox'), canvasWrap = $('canvasWrap');
+const photoCanvas = $('photoCanvas'), maskCanvas = $('maskCanvas'), sofaLayer = $('sofaLayer');
+const pctx = photoCanvas.getContext('2d', { willReadFrequently: true });
+const mctx = maskCanvas.getContext('2d', { willReadFrequently: true });
+const busy = $('busy'), busyText = $('busyText'), busyBar = $('busyBar'), busySub = $('busySub');
+const eraseBtn = $('eraseBtn'), undoBtn = $('undoBtn'), brush = $('brush'), skipErase = $('skipErase');
+const sizeR = $('sizeR'), rotR = $('rotR'), tiltR = $('tiltR'), lightR = $('lightR');
+const MAX_SIDE = 1600;
+/* نثبّت دقة الرسم حتى تطابق الصورة المحفوظة ما يظهر على الشاشة */
+customElements.whenDefined('model-viewer').then(MV => { MV.minimumRenderScale = 1; });
+const ORT_VER = '1.27.0';
+const ORT_BASE = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VER}/dist/`;
+let W = 0, H = 0, step = 'erase', undoStack = [], maskEmpty = true;
+const place = { cx: .5, cy: .64, w: .62 };
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+function showBusy(text, frac, sub){
+  busy.hidden = false; busyText.textContent = text;
+  busyBar.style.width = Math.round(clamp(frac, 0, 1) * 100) + '%';
+  busySub.textContent = sub || '';
+}
+function hideBusy(){ busy.hidden = true; }
+
+$('photoBtn').addEventListener('click', () => photoInput.click());
+$('newPhoto').addEventListener('click', () => photoInput.click());
+photoInput.addEventListener('change', async () => {
+  const file = photoInput.files[0];
+  photoInput.value = '';
+  if (!file) return;
+  let bmp;
+  try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch { toast('تعذّر فتح الصورة. جرّب صورة بصيغة JPG أو PNG.'); return; }
+  openStudio(bmp);
+});
+
+function openStudio(bmp){
+  const k = Math.min(1, MAX_SIDE / Math.max(bmp.width, bmp.height));
+  W = Math.round(bmp.width * k); H = Math.round(bmp.height * k);
+  for (const c of [photoCanvas, maskCanvas]) { c.width = W; c.height = H; }
+  pctx.drawImage(bmp, 0, 0, W, H);
+  if (bmp.close) bmp.close();
+  mctx.clearRect(0, 0, W, H);
+  undoStack = []; maskEmpty = true;
+  skipErase.textContent = 'لا يوجد ما أمسحه';
+  updateEraseUI();
+  Object.assign(place, { cx: .5, cy: .64, w: .62 });
+  sizeR.value = 62; rotR.value = 0; tiltR.value = 78; lightR.value = 88;
+  orbit(); mv2.exposure = .88;
+  const p = PRODUCTS[product];
+  if (mv2.getAttribute('src') !== p.src) mv2.setAttribute('src', p.src);
+  else applyColor(mv2);
+  setStep('erase');
+  studio.hidden = false;
+  document.body.classList.add('studio-open');
+  requestAnimationFrame(fitPhoto);
+}
+function closeStudio(){
+  studio.hidden = true;
+  document.body.classList.remove('studio-open');
+  hideBusy();
+}
+$('studioClose').addEventListener('click', closeStudio);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !studio.hidden) closeStudio(); });
+mv2.addEventListener('load', () => { viewerState.delete(mv2); applyColor(mv2); });
+
+function fitPhoto(){
+  if (studio.hidden || !W) return;
+  const r = canvasWrap.getBoundingClientRect(), pad = 12;
+  const k = Math.min((r.width - pad * 2) / W, (r.height - pad * 2) / H);
+  photoBox.style.width = Math.floor(W * k) + 'px';
+  photoBox.style.height = Math.floor(H * k) + 'px';
+}
+window.addEventListener('resize', fitPhoto);
+
+function setStep(s){
+  step = s; studio.dataset.step = s;
+  $('toolsErase').hidden = s !== 'erase';
+  $('toolsPlace').hidden = s !== 'place';
+  sofaLayer.hidden = s !== 'place';
+  maskCanvas.hidden = s !== 'erase';
+  for (const [id, name] of [['stepErase', 'erase'], ['stepPlace', 'place']]) {
+    if (s === name) $(id).setAttribute('aria-current', 'step'); else $(id).removeAttribute('aria-current');
+  }
+  if (s === 'place') positionSofa();
+  requestAnimationFrame(fitPhoto);
+}
+skipErase.addEventListener('click', () => setStep('place'));
+$('backErase').addEventListener('click', () => setStep('erase'));
+
+/* ---- الفرشاة ---- */
+let drawing = false, last = null;
+function toImg(e){
+  const r = maskCanvas.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height, s: W / r.width };
+}
+function stroke(a, b){
+  mctx.strokeStyle = '#E8455B'; mctx.lineCap = 'round'; mctx.lineJoin = 'round';
+  mctx.lineWidth = Number(brush.value) * a.s;
+  mctx.beginPath(); mctx.moveTo(a.x, a.y); mctx.lineTo(b.x + 0.01, b.y); mctx.stroke();
+}
+maskCanvas.addEventListener('pointerdown', e => {
+  if (step !== 'erase' || !busy.hidden) return;
+  pushUndo({ mask: mctx.getImageData(0, 0, W, H) });
+  drawing = true;
+  maskCanvas.setPointerCapture(e.pointerId);
+  last = toImg(e); stroke(last, last);
+});
+maskCanvas.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  const p = toImg(e); stroke(last, p); last = p;
+});
+for (const t of ['pointerup', 'pointercancel']) maskCanvas.addEventListener(t, () => {
+  if (!drawing) return;
+  drawing = false; maskEmpty = false; updateEraseUI();
+});
+function pushUndo(entry){
+  undoStack.push(entry);
+  if (undoStack.length > 6) undoStack.shift();
+  updateEraseUI();
+}
+function isMaskEmpty(){
+  const d = mctx.getImageData(0, 0, W, H).data;
+  for (let i = 3; i < d.length; i += 16) if (d[i]) return false;
+  return true;
+}
+function updateEraseUI(){
+  eraseBtn.disabled = maskEmpty;
+  undoBtn.disabled = undoStack.length === 0;
+}
+undoBtn.addEventListener('click', () => {
+  const e = undoStack.pop();
+  if (!e) return;
+  if (e.photo) pctx.putImageData(e.photo, 0, 0);
+  mctx.putImageData(e.mask, 0, 0);
+  maskEmpty = isMaskEmpty(); updateEraseUI();
+});
+
+/* توسيع المنطقة المحددة قليلاً حتى لا تبقى حافة من القطعة القديمة */
+function dilate(src, w, h, r){
+  const tmp = new Uint8Array(w * h), out = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) {
+    const row = y * w; let d = 1e9;
+    for (let x = 0; x < w; x++) { d = src[row + x] ? 0 : d + 1; if (d <= r) tmp[row + x] = 1; }
+    d = 1e9;
+    for (let x = w - 1; x >= 0; x--) { d = src[row + x] ? 0 : d + 1; if (d <= r) tmp[row + x] = 1; }
+  }
+  for (let x = 0; x < w; x++) {
+    let d = 1e9;
+    for (let y = 0; y < h; y++) { const i = y * w + x; d = tmp[i] ? 0 : d + 1; if (d <= r) out[i] = 1; }
+    d = 1e9;
+    for (let y = h - 1; y >= 0; y--) { const i = y * w + x; d = tmp[i] ? 0 : d + 1; if (d <= r) out[i] = 1; }
+  }
+  return out;
+}
+
+/* ---- أداة المحو (MI-GAN داخل المتصفح) ---- */
+let ortPromise = null, sessionPromise = null;
+function loadOrt(){
+  return ortPromise ||= new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = ORT_BASE + 'ort.wasm.min.js';
+    s.onload = () => {
+      window.ort.env.wasm.wasmPaths = ORT_BASE;
+      window.ort.env.wasm.numThreads = 1;
+      resolve(window.ort);
+    };
+    s.onerror = () => { ortPromise = null; reject(new Error('ort')); };
+    document.head.append(s);
+  });
+}
+async function fetchWithProgress(url, onProgress){
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('model ' + res.status);
+  const total = Number(res.headers.get('content-length')) || 0;
+  if (!res.body || !res.body.getReader) return new Uint8Array(await res.arrayBuffer());
+  const reader = res.body.getReader(), chunks = [];
+  let loaded = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value); loaded += value.length;
+    onProgress(loaded, total);
+  }
+  const buf = new Uint8Array(loaded); let o = 0;
+  for (const c of chunks) { buf.set(c, o); o += c.length; }
+  return buf;
+}
+function getSession(onProgress){
+  if (!sessionPromise) {
+    sessionPromise = (async () => {
+      const ort = await loadOrt();
+      const model = await fetchWithProgress('models/migan_pipeline_v2.onnx', onProgress);
+      return ort.InferenceSession.create(model, { executionProviders: ['wasm'] });
+    })();
+    sessionPromise.catch(() => { sessionPromise = null; });
+  }
+  return sessionPromise;
+}
+
+eraseBtn.addEventListener('click', async () => {
+  if (maskEmpty) return;
+  try {
+    showBusy('جارٍ تجهيز أداة المحو…', 0, '');
+    const mb = x => (x / 1048576).toFixed(0);
+    const session = await getSession((loaded, total) => {
+      showBusy('تنزيل أداة المحو (مرة واحدة فقط)', total ? loaded / total : 0,
+        total ? `${mb(loaded)} من ${mb(total)} ميغابايت` : `${mb(loaded)} ميغابايت`);
+    });
+    showBusy('جارٍ المحو…', 1, 'قد يستغرق ذلك بضع ثوانٍ');
+    await new Promise(r => setTimeout(r, 60));
+
+    const img = pctx.getImageData(0, 0, W, H), d = img.data;
+    const m = mctx.getImageData(0, 0, W, H).data;
+    const N = W * H;
+    let hole = new Uint8Array(N);
+    for (let i = 0; i < N; i++) hole[i] = m[i * 4 + 3] > 0 ? 1 : 0;
+    hole = dilate(hole, W, H, Math.round(Math.max(W, H) / 220) + 2);
+    const rgb = new Uint8Array(N * 3), mk = new Uint8Array(N);
+    for (let i = 0; i < N; i++) {
+      rgb[i] = d[i * 4]; rgb[N + i] = d[i * 4 + 1]; rgb[2 * N + i] = d[i * 4 + 2];
+      mk[i] = hole[i] ? 0 : 255;        // 0 = المنطقة التي تُمحى
+    }
+    const ort = window.ort;
+    const out = await session.run({
+      image: new ort.Tensor('uint8', rgb, [1, 3, H, W]),
+      mask: new ort.Tensor('uint8', mk, [1, 1, H, W]),
+    });
+    const r = out[session.outputNames[0]].data;
+
+    pushUndo({ photo: img, mask: mctx.getImageData(0, 0, W, H) });
+    const res = new ImageData(new Uint8ClampedArray(d), W, H), rd = res.data;
+    for (let i = 0; i < N; i++) if (hole[i]) {
+      rd[i * 4] = r[i]; rd[i * 4 + 1] = r[N + i]; rd[i * 4 + 2] = r[2 * N + i];
+    }
+    pctx.putImageData(res, 0, 0);
+    mctx.clearRect(0, 0, W, H);
+    maskEmpty = true; updateEraseUI();
+    skipErase.textContent = 'التالي: ضع الكنبة';
+    hideBusy();
+    toast('تم المحو. إن بقي أثر فامسحه مرة أخرى، أو انتقل إلى وضع الكنبة.');
+  } catch (err) {
+    console.error(err);
+    hideBusy();
+    toast('تعذّر المحو على هذا الجهاز. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.');
+  }
+});
+
+/* ---- وضع الكنبة الجديدة ---- */
+function positionSofa(){
+  sofaLayer.style.left = (place.cx * 100) + '%';
+  sofaLayer.style.top = (place.cy * 100) + '%';
+  sofaLayer.style.width = (place.w * 100) + '%';
+}
+function orbit(){ mv2.cameraOrbit = `${rotR.value}deg ${tiltR.value}deg 80%`; }
+sizeR.addEventListener('input', () => { place.w = sizeR.value / 100; positionSofa(); });
+rotR.addEventListener('input', orbit);
+tiltR.addEventListener('input', orbit);
+lightR.addEventListener('input', () => { mv2.exposure = lightR.value / 100; });
+
+const pointers = new Map();
+let gesture = null;
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+function startGesture(){
+  const pts = [...pointers.values()];
+  const mid = pts.length > 1 ? { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 } : pts[0];
+  gesture = { x: mid.x, y: mid.y, cx: place.cx, cy: place.cy, w: place.w, d: pts.length > 1 ? dist(pts[0], pts[1]) : 0 };
+}
+sofaLayer.addEventListener('pointerdown', e => {
+  sofaLayer.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  sofaLayer.classList.add('dragging');
+  startGesture();
+});
+sofaLayer.addEventListener('pointermove', e => {
+  if (!pointers.has(e.pointerId) || !gesture) return;
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  const b = photoBox.getBoundingClientRect(), pts = [...pointers.values()];
+  let x = pts[0].x, y = pts[0].y;
+  if (pts.length > 1 && gesture.d) {
+    x = (pts[0].x + pts[1].x) / 2; y = (pts[0].y + pts[1].y) / 2;
+    place.w = clamp(gesture.w * dist(pts[0], pts[1]) / gesture.d, .15, 1.6);
+    sizeR.value = Math.round(place.w * 100);
+  }
+  place.cx = clamp(gesture.cx + (x - gesture.x) / b.width, 0, 1);
+  place.cy = clamp(gesture.cy + (y - gesture.y) / b.height, 0, 1);
+  positionSofa();
+});
+for (const t of ['pointerup', 'pointercancel']) sofaLayer.addEventListener(t, e => {
+  pointers.delete(e.pointerId);
+  if (pointers.size) startGesture();
+  else { gesture = null; sofaLayer.classList.remove('dragging'); }
+});
+sofaLayer.addEventListener('wheel', e => {
+  e.preventDefault();
+  place.w = clamp(place.w * (1 - e.deltaY * 0.001), .15, 1.6);
+  sizeR.value = Math.round(place.w * 100);
+  positionSofa();
+}, { passive: false });
+
+/* ---- حفظ الصورة النهائية ---- */
+$('saveBtn').addEventListener('click', async () => {
+  try {
+    showBusy('جارٍ تجهيز الصورة…', 1, '');
+    const out = document.createElement('canvas');
+    out.width = W; out.height = H;
+    const ctx = out.getContext('2d');
+    ctx.drawImage(photoCanvas, 0, 0);
+    const png = await mv2.toBlob({ mimeType: 'image/png', idealAspect: false });
+    const bmp = await createImageBitmap(png);
+    const b = photoBox.getBoundingClientRect(), r = sofaLayer.getBoundingClientRect(), k = W / b.width;
+    ctx.drawImage(bmp, (r.left - b.left) * k, (r.top - b.top) * k, r.width * k, r.height * k);
+    const jpg = await new Promise(res => out.toBlob(res, 'image/jpeg', 0.92));
+    hideBusy();
+    const file = new File([jpg], 'غرفتي-مع-الكنبة.jpg', { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: PRODUCTS[product].title }); return; }
+      catch (err) { if (err.name === 'AbortError') return; }
+    }
+    const url = URL.createObjectURL(jpg);
+    const a = document.createElement('a');
+    a.href = url; a.download = file.name;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    toast('حُفظت الصورة في التنزيلات.');
+  } catch (err) {
+    console.error(err);
+    hideBusy();
+    toast('تعذّر حفظ الصورة. حاول مرة أخرى.');
+  }
 });
 </script>
 </body>
