@@ -163,6 +163,24 @@ legend output{color:var(--muted);font-weight:500}
 .swatch input:checked + span{box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 0 0 3px var(--surface),0 0 0 5px var(--accent)}
 .swatch input:focus-visible + span{outline:2px solid var(--accent);outline-offset:6px}
 .swatch input:hover + span{transform:scale(1.06)}
+.swatches[data-kind="leather"] .swatch span{
+  background-image:
+    radial-gradient(circle at 34% 28%,rgba(255,255,255,.38),rgba(255,255,255,0) 52%),
+    radial-gradient(circle at 70% 82%,rgba(0,0,0,.28),rgba(0,0,0,0) 60%);
+}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.picker{
+  display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;
+  border-radius:14px;background:var(--ground);border:1px solid var(--line);
+}
+.picker label{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  min-height:44px;border-radius:10px;cursor:pointer;text-align:center;
+  font-size:.92rem;font-weight:600;color:var(--muted);
+}
+.picker input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.picker label:has(input:checked){background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.picker label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
 
 .actions{display:flex;flex-direction:column;gap:10px}
 .btn{
@@ -215,11 +233,11 @@ legend output{color:var(--muted);font-weight:500}
 
   <section class="stage" aria-label="معاينة ثلاثية الأبعاد للكنبة">
     <model-viewer id="mv"
-      src="sofa.glb"
-      alt="كنبة ثلاثية بقماش وأرجل خشبية"
+      src="chesterfield.glb"
+      alt="كنبة تشسترفيلد ثلاثية بجلد مبطّن بالأزرار"
       camera-controls
       touch-action="pan-y"
-      camera-orbit="35deg 72deg auto"
+      camera-orbit="35deg 72deg 112%"
       auto-rotate auto-rotate-delay="4000" rotation-per-second="10deg"
       shadow-intensity="1" shadow-softness="0.9"
       environment-image="neutral" exposure="0.88"
@@ -236,9 +254,9 @@ legend output{color:var(--muted);font-weight:500}
       <button class="dot" slot="hotspot-d1" data-position="1.11m 0m -0.46m" data-normal="1m 0m 0m" tabindex="-1" aria-hidden="true"></button>
       <button class="dot" slot="hotspot-d2" data-position="1.11m 0m 0.47m" data-normal="1m 0m 0m" tabindex="-1" aria-hidden="true"></button>
       <button class="dot" slot="hotspot-h2" data-position="1.11m 0.9m -0.46m" data-normal="1m 0m 0m" tabindex="-1" aria-hidden="true"></button>
-      <button class="dim-label" slot="hotspot-wl" data-position="0m 0m 0.53m" data-normal="0m 0m 1m" tabindex="-1">210 سم</button>
-      <button class="dim-label" slot="hotspot-dl" data-position="1.11m 0m 0m" data-normal="1m 0m 0m" tabindex="-1">93 سم</button>
-      <button class="dim-label" slot="hotspot-hl" data-position="1.11m 0.45m -0.46m" data-normal="1m 0m 0m" tabindex="-1">90 سم</button>
+      <button class="dim-label" slot="hotspot-wl" data-position="0m 0m 0.51m" data-normal="0m 0m 1m" tabindex="-1">210 سم</button>
+      <button class="dim-label" slot="hotspot-dl" data-position="1.11m 0m 0m" data-normal="1m 0m 0m" tabindex="-1">90 سم</button>
+      <button class="dim-label" slot="hotspot-hl" data-position="1.11m 0.39m -0.45m" data-normal="1m 0m 0m" tabindex="-1">78 سم</button>
       <svg class="dim-lines" aria-hidden="true">
         <line id="lw"></line><line id="ld"></line><line id="lh"></line>
       </svg>
@@ -256,26 +274,28 @@ legend output{color:var(--muted);font-weight:500}
   <main class="panel">
     <div class="grip" aria-hidden="true"></div>
 
+    <fieldset>
+      <legend class="sr-only">اختر الكنبة</legend>
+      <div class="picker" id="picker">
+        <label><input type="radio" name="product" id="p-chesterfield" value="chesterfield" checked>تشسترفيلد جلد</label>
+        <label><input type="radio" name="product" id="p-modern" value="modern">عصرية قماش</label>
+      </div>
+    </fieldset>
+
     <div>
-      <p class="kicker">غرفة المعيشة · كنب</p>
-      <h1>كنبة ثلاثية بطراز عصري</h1>
+      <p class="kicker" id="kicker">غرفة المعيشة · كنب جلد</p>
+      <h1 id="title">كنبة تشسترفيلد جلد</h1>
     </div>
 
     <div class="specs" aria-label="المقاسات">
       <div class="spec"><span>العرض</span><strong><bdi id="sw">210</bdi><small>سم</small></strong></div>
-      <div class="spec"><span>العمق</span><strong><bdi id="sd">93</bdi><small>سم</small></strong></div>
-      <div class="spec"><span>الارتفاع</span><strong><bdi id="sh">90</bdi><small>سم</small></strong></div>
+      <div class="spec"><span>العمق</span><strong><bdi id="sd">90</bdi><small>سم</small></strong></div>
+      <div class="spec"><span>الارتفاع</span><strong><bdi id="sh">78</bdi><small>سم</small></strong></div>
     </div>
 
     <fieldset>
-      <legend>لون القماش: <output id="colorName">رملي</output></legend>
-      <div class="swatches" id="swatches">
-        <label class="swatch" title="رملي"><input type="radio" name="fabric" id="c-sand" value="#C4B296" data-name="رملي" checked><span style="--c:#C4B296"></span></label>
-        <label class="swatch" title="زيتوني"><input type="radio" name="fabric" id="c-olive" value="#7C7E57" data-name="زيتوني"><span style="--c:#7C7E57"></span></label>
-        <label class="swatch" title="فحمي"><input type="radio" name="fabric" id="c-charcoal" value="#4A4D50" data-name="فحمي"><span style="--c:#4A4D50"></span></label>
-        <label class="swatch" title="نيلي"><input type="radio" name="fabric" id="c-indigo" value="#34466F" data-name="نيلي"><span style="--c:#34466F"></span></label>
-        <label class="swatch" title="طوبي"><input type="radio" name="fabric" id="c-brick" value="#A65F45" data-name="طوبي"><span style="--c:#A65F45"></span></label>
-      </div>
+      <legend><span id="legendLabel">لون الجلد</span>: <output id="colorName">كستنائي</output></legend>
+      <div class="swatches" id="swatches" data-kind="leather"></div>
     </fieldset>
 
     <div class="actions">
@@ -312,6 +332,9 @@ function toast(msg){
 }
 
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) mv.removeAttribute('auto-rotate');
+/* على الشاشة الضيقة نبعد الكاميرا قليلاً حتى تظهر الكنبة كاملة مع مقاساتها */
+const NARROW = window.matchMedia('(max-width: 600px)').matches;
+if (NARROW) mv.setAttribute('camera-orbit', '35deg 72deg 142%');
 
 /* شريط التحميل */
 const bar = document.getElementById('bar');
@@ -321,17 +344,92 @@ mv.addEventListener('progress', e => {
   if (p >= 1) setTimeout(() => { bar.parentElement.hidden = true; }, 300);
 });
 
-/* لون القماش */
-let fabricColor = document.querySelector('input[name="fabric"]:checked').value;
-function applyColor(){
-  const m = mv.model && mv.model.materials.find(x => x.name === 'Fabric');
-  if (m) m.pbrMetallicRoughness.setBaseColorFactor(fabricColor);
+/* الكتالوج: كل كنبة بمجسمها وألوانها */
+const PRODUCTS = {
+  chesterfield: {
+    src: 'chesterfield.glb', alt: 'كنبة تشسترفيلد ثلاثية بجلد مبطّن بالأزرار',
+    kicker: 'غرفة المعيشة · كنب جلد', title: 'كنبة تشسترفيلد جلد',
+    material: 'Leather', mode: 'texture', kind: 'leather', legend: 'لون الجلد',
+    swatches: [
+      { id: 'chestnut', name: 'كستنائي', color: '#7A3A14', tex: null },
+      { id: 'cognac',   name: 'كونياك',  color: '#A8642A', tex: 'textures/leather-cognac.jpg' },
+      { id: 'oxblood',  name: 'خمري',    color: '#5E1419', tex: 'textures/leather-oxblood.jpg' },
+      { id: 'green',    name: 'أخضر داكن', color: '#24553C', tex: 'textures/leather-green.jpg' },
+      { id: 'black',    name: 'أسود',    color: '#2E2B29', tex: 'textures/leather-black.jpg' },
+    ],
+  },
+  modern: {
+    src: 'sofa.glb', alt: 'كنبة ثلاثية بقماش وأرجل خشبية',
+    kicker: 'غرفة المعيشة · كنب قماش', title: 'كنبة ثلاثية بطراز عصري',
+    material: 'Fabric', mode: 'factor', kind: 'fabric', legend: 'لون القماش',
+    swatches: [
+      { id: 'sand',     name: 'رملي',   color: '#C4B296' },
+      { id: 'olive',    name: 'زيتوني', color: '#7C7E57' },
+      { id: 'charcoal', name: 'فحمي',   color: '#4A4D50' },
+      { id: 'indigo',   name: 'نيلي',   color: '#34466F' },
+      { id: 'brick',    name: 'طوبي',   color: '#A65F45' },
+    ],
+  },
+};
+let product = 'chesterfield';
+let swatch = PRODUCTS[product].swatches[0];
+let originalTex = null, texCache = {}, applyToken = 0;
+
+const swatchesEl = document.getElementById('swatches');
+function renderSwatches(){
+  const p = PRODUCTS[product];
+  swatchesEl.dataset.kind = p.kind;
+  swatchesEl.replaceChildren(...p.swatches.map(s => {
+    const label = document.createElement('label');
+    label.className = 'swatch'; label.title = s.name;
+    const input = document.createElement('input');
+    input.type = 'radio'; input.name = 'color'; input.id = `c-${product}-${s.id}`;
+    input.value = s.id; input.checked = s === swatch;
+    const chip = document.createElement('span');
+    chip.style.setProperty('--c', s.color);
+    label.append(input, chip);
+    return label;
+  }));
+  document.getElementById('legendLabel').textContent = p.legend;
+  document.getElementById('colorName').textContent = swatch.name;
 }
-document.getElementById('swatches').addEventListener('change', e => {
-  fabricColor = e.target.value;
-  document.getElementById('colorName').textContent = e.target.dataset.name;
+
+async function applyColor(){
+  const p = PRODUCTS[product];
+  const m = mv.model && mv.model.materials.find(x => x.name === p.material);
+  if (!m) return;
+  if (p.mode === 'factor') { m.pbrMetallicRoughness.setBaseColorFactor(swatch.color); return; }
+  const slot = m.pbrMetallicRoughness.baseColorTexture;
+  if (!originalTex) originalTex = slot.texture;
+  const token = ++applyToken;
+  if (!swatch.tex) { slot.setTexture(originalTex); return; }
+  try {
+    const tex = await (texCache[swatch.tex] ||= mv.createTexture(swatch.tex));
+    if (token === applyToken) slot.setTexture(tex);
+  } catch {
+    delete texCache[swatch.tex];
+    toast('تعذّر تحميل هذا اللون. حاول مرة أخرى.');
+  }
+}
+
+swatchesEl.addEventListener('change', e => {
+  swatch = PRODUCTS[product].swatches.find(s => s.id === e.target.value);
+  document.getElementById('colorName').textContent = swatch.name;
   applyColor();
 });
+
+document.getElementById('picker').addEventListener('change', e => {
+  product = e.target.value;
+  const p = PRODUCTS[product];
+  swatch = p.swatches[0];
+  document.getElementById('kicker').textContent = p.kicker;
+  document.getElementById('title').textContent = p.title;
+  renderSwatches();
+  bar.style.width = '0'; bar.parentElement.hidden = false;
+  mv.alt = p.alt;
+  mv.src = p.src;
+});
+renderSwatches();
 
 /* المقاسات من أبعاد المجسم الفعلية */
 function setupDims(){
@@ -350,6 +448,8 @@ function setupDims(){
   mv.updateHotspot({name:'hotspot-dl', position:P(x1+off, y0, c.z)});
   mv.updateHotspot({name:'hotspot-h2', position:P(x1+off, y1, z0)});
   mv.updateHotspot({name:'hotspot-hl', position:P(x1+off, c.y, z0)});
+  /* نزيح مركز الكاميرا قليلاً حتى يتسع خط الارتفاع على يمين الشاشة الضيقة */
+  if (NARROW) mv.cameraTarget = `${c.x + 0.2}m ${c.y}m ${c.z}m`;
   const cm = v => Math.round(v * 100);
   document.getElementById('sw').textContent = cm(d.x);
   document.getElementById('sd').textContent = cm(d.z);
@@ -384,6 +484,7 @@ dimsBtn.addEventListener('click', () => {
 /* الواقع المعزز */
 const arNote = document.getElementById('arNote');
 mv.addEventListener('load', () => {
+  originalTex = null; texCache = {};
   applyColor();
   setupDims();
   requestAnimationFrame(drawDims);
@@ -402,8 +503,7 @@ mv.addEventListener('ar-status', e => {
 
 /* الطلب (تجريبي) */
 document.getElementById('orderBtn').addEventListener('click', () => {
-  const name = document.querySelector('input[name="fabric"]:checked').dataset.name;
-  toast(`أُضيفت الكنبة باللون ${name} إلى الطلب. في النسخة الكاملة يصل الطلب إلى المحل مباشرة.`);
+  toast(`أُضيفت ${PRODUCTS[product].title} باللون ${swatch.name} إلى الطلب. في النسخة الكاملة يصل الطلب إلى المحل مباشرة.`);
 });
 </script>
 </body>
